@@ -1,0 +1,31 @@
+---
+- hosts: lab
+  remote_user: centos
+  sudo: yes
+
+  tasks:
+  - name: bootstrap epel-release install
+    copy: src=ansible-bootstrap-epel.repo dest=/etc/yum.repos.d/ owner=root group=root mode=0644
+
+  - name: epel-release install
+    yum: name=epel-release enablerepo=ansible-bootstrap-epel state=present
+
+  - name: epel repository enable
+    ini_file: dest=/etc/yum.repos.d/epel.repo section=epel option=enabled value=1
+
+  tasks:
+  - name: install zabbix-agent
+    yum: name=zabbix22-agent state=latest
+    notify:
+      - Start Zabbix-agent
+      - Opening port 10050
+
+  - name: copy configuration file
+    copy: src=./files/zabbix_agentd.conf dest=/etc/zabbix/zabbix_agentd.conf seuser=system_u
+
+  handlers:
+  - name: Start Zabbix-agent
+    service: name=zabbix-agent state=started enabled=yes
+
+  - name: Opening port 10050
+    firewalld: port=10050/tcp permanent=true state=enabled

@@ -1,0 +1,34 @@
+---
+- hosts: lab
+  remote_user: centos
+  sudo: yes
+
+  tasks:
+  - name: bootstrap epel-release install
+    copy: src=ansible-bootstrap-epel.repo dest=/etc/yum.repos.d/ owner=root group=root mode=0644
+  - name: epel-release install
+    yum: name=epel-release enablerepo=ansible-bootstrap-epel state=present
+  - name: epel repository enable
+    ini_file: dest=/etc/yum.repos.d/epel.repo section=epel option=enabled value=1
+
+  tasks:
+  - name: Installing System Utilities
+    yum: name={{ item }} state=latest
+    with_items:
+     - curl
+     - deltarpm
+     - libcurl-devel
+     - vim
+     - vim-enhanced
+     - ruby
+     - rubygem-rake
+     - ruby-devel
+     - gcc-c++
+     - gcc
+     - make
+     - git
+     - gpg
+     - p7zip
+     - p7zip-plugins
+     - unzip
+     - nmap
